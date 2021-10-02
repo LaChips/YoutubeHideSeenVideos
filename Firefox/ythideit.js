@@ -31,7 +31,7 @@ function removeVids(nodes) {
 
 function getVideoContainer(node) {
 	let tmp = node;
-	while (tmp && tmp.tagName != "YTD-VIDEO-RENDERER") {
+	while (tmp && tmp.tagName != "YTD-VIDEO-RENDERER" && tmp.tagName != "YTD-COMPACT-VIDEO-RENDERER") {
 		tmp = tmp.parentNode;
 	}
 	return tmp;
