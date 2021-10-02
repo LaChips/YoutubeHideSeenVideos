@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "YTHideIt",
-  "version": "2.0",
+  "version": "2.1",
 
   "description": "Allow to remove already seen videos from the youtube search results and recommended videos. Threshold can be adjusted.",
 
