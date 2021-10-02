@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+	  	<meta charset="utf-8">
+	  	<link rel="stylesheet" href="hideitInterface.css"/>
+	</head>
+	<body>
+		<div class="text-center w-100 px-10">
+			<p id="threshold_title">Threshold<span id="threshold_desc" title="Remove videos with a watch time superior to the threshold range"><b>?</b></span></p>
+			<div id="threshold_container">
+				<input type="range" id="threshold" name="threshold"
+			     min="0" max="100" value="90" step="1">
+			     <label id="threshold_value" for="threshold">90%</label>
+			</div>
+			<hr>
+		</div>
+		<div class="text-center w-100 px-10">
+			<button id="hideitbtn" style="">Hide</button>
+		</div>
+		<script src="hideitInterface.js"></script>
+	</body>
+</html>
