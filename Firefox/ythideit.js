@@ -14,10 +14,9 @@ async function requestHandler(options, sender, sendResponse) {
 		localStorage.setItem("ythiderangevalue", 'false');
 		localStorage.setItem("ythidebtnstate", 'false');
 		let nodes = document.getElementsByClassName("yt-hide-seen-video");
-		for (let i = 0; i < nodes.length; i++) {
+		for (let i = nodes.length - 1; i >= 0; i--) {
 			nodes[i].style.display = 'block';
-			nodes[i].classList.remove("yt-hide-seen-video");
-			
+			nodes[i].classList.remove("yt-hide-seen-video")
 		}
 	}
 }
