@@ -1,8 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "YTHideIt",
-  "version": "2.1",
-
+  "name": "YT Hide Seen Videos",
+  "version": "2.2.0",
   "description": "Allow to remove already seen videos from the youtube search results and recommended videos. Threshold can be adjusted.",
 
   "icons": {
@@ -11,7 +10,7 @@
   },
 
   "permissions": [
-    "<all_urls>",
+    "*://*.youtube.com/*",
     "activeTab",
     "webRequest"
   ],
@@ -24,7 +23,7 @@
 
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["*://*.youtube.com/*"],
       "js": ["ythideit.js"]
     }
   ]

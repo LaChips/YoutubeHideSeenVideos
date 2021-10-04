@@ -1,18 +1,28 @@
-var active = false;
-var threshold = 90;
+var active = (localStorage.getItem("ythiderangevalue") == 'true') ? true : false;
+var threshold = localStorage.getItem("ythiderangevalue") || 90;
+
+const tagNames = [
+	"YTD-VIDEO-RENDERER",
+	"YTD-COMPACT-VIDEO-RENDERER",
+	"YTD-GRID-VIDEO-RENDERER"
+];
 
 async function requestHandler(options, sender, sendResponse) {
-	console.log("options :", options);
 	if (options.removeSeenVids === true) {
 		threshold = options.threshold;
+		localStorage.setItem("ythiderangevalue", options.threshold);
+		localStorage.setItem("ythidebtnstate", 'true');
 		active = true;
 		removeSeenVids();
 	}
 	else {
-		const nodes = document.getElementsByClassName("yt-hide-seen-video");
-		for (node of nodes) {
-			node.classList.remove("yt-hide-seen-video");
+		active = false;
+		localStorage.setItem("ythiderangevalue", 'false');
+		localStorage.setItem("ythidebtnstate", 'false');
+		let nodes = document.getElementsByClassName("yt-hide-seen-video");
+		for (let i = nodes.length - 1; i >= 0; i--) {
 			nodes[i].style.display = 'block';
+			nodes[i].classList.remove("yt-hide-seen-video")
 		}
 	}
 }
@@ -26,7 +36,7 @@ function removeVids(nodes) {
 
 function getVideoContainer(node) {
 	let tmp = node;
-	while (tmp && tmp.tagName != "YTD-VIDEO-RENDERER") {
+	while (tmp && tagNames.indexOf(tmp.tagName) == -1) {
 		tmp = tmp.parentNode;
 	}
 	return tmp;
@@ -36,17 +46,25 @@ function removeSeenVids() {
 	const hasProgress = document.getElementsByClassName("ytd-thumbnail-overlay-resume-playback-renderer");
 	let toRemove = [];
 	for (progress of hasProgress) {
+		const container = getVideoContainer(progress);
 		if (parseInt(progress.style.width.split("%")[0]) > threshold) {
-			toRemove.push(getVideoContainer(progress));
+			toRemove.push(container);
+		}
+		else if (container.classList.contains("yt-hide-seen-video")) {
+			container.style.display = 'block';
+			container.classList.remove("yt-hide-seen-video")
 		}
 	}
-	console.log("toRemove :", toRemove);
 	removeVids(toRemove);
 }
 
-document.addEventListener("scroll", (e) => {
-	if (active)
+function searchProgress() {
+	const hasProgress = document.getElementsByClassName("ytd-thumbnail-overlay-resume-playback-renderer");
+	let is_active = localStorage.getItem("ythidebtnstate");
+	if (hasProgress.length > 0 && is_active == 'true')
 		removeSeenVids();
-});
+}
+
+var refreshIntervalId = setInterval(searchProgress, 100);
 
 chrome.runtime.onMessage.addListener(requestHandler);

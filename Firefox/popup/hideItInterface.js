@@ -15,9 +15,10 @@ function handleBtnChange(btn) {
 }
 
 function sendMessage(state, threshold) {
-	var gettingActiveTab = browser.tabs.query({active: true, currentWindow: true});
+	var gettingActiveTab = browser.tabs.query({url: "*://*.youtube.com/*", currentWindow: true});
 	gettingActiveTab.then((tabs) => {
-		browser.tabs.sendMessage(tabs[0].id, {removeSeenVids: state, threshold: threshold});
+		for (let tab of tabs)
+			browser.tabs.sendMessage(tab.id, {removeSeenVids: state, threshold: threshold});
 	});
 }
 
@@ -28,8 +29,12 @@ document.getElementById("hideitbtn").addEventListener("click", function(e) {
 });
 
 document.getElementById("threshold").addEventListener("change", function(e) {
-	document.getElementById("threshold_value").innerText = e.target.value + "%";
-	localStorage.setItem("ythiderangevalue", parseInt(e.target.value));
+	let state = (localStorage.getItem("ythidebtnstate") == 'true');
+	const threshold = parseInt(e.target.value);
+	document.getElementById("threshold_value").innerText = threshold + "%";
+	localStorage.setItem("ythiderangevalue", threshold);
+	console.log("state :", state);
+	sendMessage(state, threshold);
 });
 
 document.addEventListener("DOMContentLoaded", (e) => {

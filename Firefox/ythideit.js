@@ -1,6 +1,12 @@
 var active = (localStorage.getItem("ythiderangevalue") == 'true') ? true : false;
 var threshold = localStorage.getItem("ythiderangevalue") || 90;
 
+const tagNames = [
+	"YTD-VIDEO-RENDERER",
+	"YTD-COMPACT-VIDEO-RENDERER",
+	"YTD-GRID-VIDEO-RENDERER"
+];
+
 async function requestHandler(options, sender, sendResponse) {
 	if (options.removeSeenVids === true) {
 		threshold = options.threshold;
@@ -30,7 +36,7 @@ function removeVids(nodes) {
 
 function getVideoContainer(node) {
 	let tmp = node;
-	while (tmp && tmp.tagName != "YTD-VIDEO-RENDERER" && tmp.tagName != "YTD-COMPACT-VIDEO-RENDERER") {
+	while (tmp && tagNames.indexOf(tmp.tagName) == -1) {
 		tmp = tmp.parentNode;
 	}
 	return tmp;
@@ -40,15 +46,17 @@ function removeSeenVids() {
 	const hasProgress = document.getElementsByClassName("ytd-thumbnail-overlay-resume-playback-renderer");
 	let toRemove = [];
 	for (progress of hasProgress) {
+		const container = getVideoContainer(progress);
 		if (parseInt(progress.style.width.split("%")[0]) > threshold) {
-			const container = getVideoContainer(progress);
 			toRemove.push(container);
+		}
+		else if (container.classList.contains("yt-hide-seen-video")) {
+			container.style.display = 'block';
+			container.classList.remove("yt-hide-seen-video")
 		}
 	}
 	removeVids(toRemove);
 }
-
-
 
 function searchProgress() {
 	const hasProgress = document.getElementsByClassName("ytd-thumbnail-overlay-resume-playback-renderer");
