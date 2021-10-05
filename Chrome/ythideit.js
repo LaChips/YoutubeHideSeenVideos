@@ -1,10 +1,12 @@
-var active = (localStorage.getItem("ythiderangevalue") == 'true') ? true : false;
+var active = (localStorage.getItem("ythidebtnstate") == 'true') ? true : false;
 var threshold = localStorage.getItem("ythiderangevalue") || 90;
+var refreshIntervalId;
 
 const tagNames = [
 	"YTD-VIDEO-RENDERER",
 	"YTD-COMPACT-VIDEO-RENDERER",
-	"YTD-GRID-VIDEO-RENDERER"
+	"YTD-GRID-VIDEO-RENDERER",
+	"YTD-RICH-ITEM-RENDERER"
 ];
 
 async function requestHandler(options, sender, sendResponse) {
@@ -13,9 +15,11 @@ async function requestHandler(options, sender, sendResponse) {
 		localStorage.setItem("ythiderangevalue", options.threshold);
 		localStorage.setItem("ythidebtnstate", 'true');
 		active = true;
+		refreshIntervalId = setInterval(searchProgress, 100);
 		removeSeenVids();
 	}
 	else {
+		console.log("disactivate");
 		active = false;
 		localStorage.setItem("ythiderangevalue", 'false');
 		localStorage.setItem("ythidebtnstate", 'false');
@@ -24,6 +28,7 @@ async function requestHandler(options, sender, sendResponse) {
 			nodes[i].style.display = 'block';
 			nodes[i].classList.remove("yt-hide-seen-video")
 		}
+		clearInterval(refreshIntervalId);
 	}
 }
 
@@ -46,8 +51,7 @@ function removeSeenVids() {
 	const hasProgress = document.getElementsByClassName("ytd-thumbnail-overlay-resume-playback-renderer");
 	let toRemove = [];
 	for (progress of hasProgress) {
-		const container = getVideoContainer(progress);
-		if (parseInt(progress.style.width.split("%")[0]) > threshold) {
+		const container = getVideoContainer(progress);		if (parseInt(progress.style.width.split("%")[0]) > threshold) {
 			toRemove.push(container);
 		}
 		else if (container.classList.contains("yt-hide-seen-video")) {
@@ -59,12 +63,12 @@ function removeSeenVids() {
 }
 
 function searchProgress() {
-	const hasProgress = document.getElementsByClassName("ytd-thumbnail-overlay-resume-playback-renderer");
 	let is_active = localStorage.getItem("ythidebtnstate");
-	if (hasProgress.length > 0 && is_active == 'true')
+	if (is_active == 'true')
 		removeSeenVids();
 }
 
-var refreshIntervalId = setInterval(searchProgress, 100);
+if (active)
+	refreshIntervalId = setInterval(searchProgress, 2000);
 
 chrome.runtime.onMessage.addListener(requestHandler);
